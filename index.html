@@ -102,7 +102,7 @@
     .item-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 1px; }
     .item-desc { font-size: 12px; color: var(--secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .badges { display: flex; gap: 5px; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+    .badges { display: flex; gap: 5px; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; row-gap: 4px; }
     .badge {
       font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 4px; white-space: nowrap;
     }
@@ -548,8 +548,8 @@ function render() {
       </div>
       <div class="badges">
         ${item.active ? '<span class="badge badge-active">● Active</span>' : ''}
-        <span class="badge bi-${item.impact}">${impactLabel(item.impact)}</span>
-        <span class="badge bc-${item.complexity}">⚙ ${cap(item.complexity)}</span>
+        <span class="badge bi-${item.impact}">Impact: ${impactLabel(item.impact)}</span>
+        <span class="badge bc-${item.complexity}">Complexity: ${cap(item.complexity)}</span>
         <span class="badge bs-${item.status}">${cap(item.status)}</span>
       </div>
       <button class="active-btn${item.active ? ' on' : ''}" onclick="toggleActive(event,'${esc(item.id)}')" title="${item.active ? 'Mark inactive' : 'Mark active'}">
