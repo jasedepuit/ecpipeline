@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EC Feature Pipeline</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <style>
+    :root {
+      --orange: #FF6F42;
+      --orange-hover: #e55a2b;
+      --navy: #1a1a1a;
+      --text: #1a1f2e;
+      --secondary: #6b7280;
+      --bg: #f7f8fa;
+      --border: #eaecf0;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Gate ──────────────────────────────────────────────── */
+    #gate {
+      position: fixed; inset: 0; background: var(--navy);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    #gate.hidden { display: none; }
+    .gate-box {
+      background: #242424; border-radius: 14px; padding: 44px 40px;
+      width: 100%; max-width: 380px; text-align: center;
+    }
+    .gate-logo { font-size: 18px; font-weight: 800; color: var(--orange); letter-spacing: -0.5px; margin-bottom: 4px; }
+    .gate-sub { font-size: 13px; color: #6b7280; margin-bottom: 32px; }
+    .gate-input {
+      width: 100%; padding: 12px 14px; background: #1a1a1a; border: 1px solid #383838;
+      border-radius: 8px; color: #fff; font-size: 15px; outline: none; margin-bottom: 10px;
+    }
+    .gate-input:focus { border-color: var(--orange); }
+    .gate-btn {
+      width: 100%; padding: 12px; background: var(--orange); color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .gate-btn:hover { background: var(--orange-hover); }
+    .gate-err { color: #f87171; font-size: 13px; margin-top: 10px; display: none; }
+
+    /* ── Header ────────────────────────────────────────────── */
+    header {
+      background: var(--navy); color: #fff; height: 60px;
+      padding: 0 32px; display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .h-logo { font-size: 14px; font-weight: 800; color: var(--orange); letter-spacing: -0.3px; }
+    .h-div { width: 1px; height: 20px; background: rgba(255,255,255,0.18); }
+    header h1 { font-size: 14px; font-weight: 600; }
+    .h-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .btn {
+      padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-primary:hover { background: var(--orange-hover); }
+    .btn-ghost { background: rgba(255,255,255,0.1); color: #fff; }
+    .btn-ghost:hover { background: rgba(255,255,255,0.16); }
+
+    /* ── Main ──────────────────────────────────────────────── */
+    main { max-width: 1060px; margin: 0 auto; padding: 28px 24px 80px; }
+
+    .toolbar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .toolbar-label { font-size: 13px; color: var(--secondary); }
+    .item-count {
+      background: #e5e7eb; color: var(--secondary); font-size: 12px;
+      font-weight: 600; padding: 2px 8px; border-radius: 10px;
+    }
+    .filters { display: flex; gap: 6px; margin-left: auto; }
+    .chip {
+      padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--secondary);
+    }
+    .chip.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    /* ── Pipeline list ─────────────────────────────────────── */
+    .pipeline { list-style: none; }
+
+    .p-item {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      margin-bottom: 5px; display: flex; align-items: center; padding: 11px 14px;
+      gap: 10px; cursor: pointer; transition: box-shadow 0.12s, border-color 0.12s;
+      position: relative;
+    }
+    .p-item:hover { border-color: #cdd0d8; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .p-item.is-active { border-left: 3px solid var(--orange); padding-left: 11px; }
+    .p-item.sortable-ghost { opacity: 0.35; background: #f0f2f5; }
+    .p-item.sortable-chosen { box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-color: #cdd0d8; }
+
+    .drag { color: #d1d5db; cursor: grab; flex-shrink: 0; font-size: 15px; padding: 2px 0; line-height: 1; }
+    .drag:active { cursor: grabbing; }
+    .rank { font-size: 11px; font-weight: 700; color: #d1d5db; width: 18px; text-align: right; flex-shrink: 0; }
+
+    .item-body { flex: 1; min-width: 0; }
+    .item-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 1px; }
+    .item-desc { font-size: 12px; color: var(--secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .badges { display: flex; gap: 5px; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+    .badge {
+      font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 4px; white-space: nowrap;
+    }
+    .bi-high  { background: #fee2e2; color: #991b1b; }
+    .bi-med   { background: #fef3c7; color: #92400e; }
+    .bi-low   { background: #dcfce7; color: #166534; }
+    .bc-high  { background: #ede9fe; color: #5b21b6; }
+    .bc-med   { background: #e0f2fe; color: #075985; }
+    .bc-low   { background: #dcfce7; color: #166534; }
+    .bs-blocked { background: #fee2e2; color: #991b1b; }
+    .bs-parked  { background: #f3f4f6; color: #9ca3af; }
+    .bs-planned { display: none; }
+    .badge-active { background: var(--orange); color: #fff; }
+
+    /* Active toggle button */
+    .active-btn {
+      background: none; border: 1px solid var(--border); cursor: pointer;
+      color: #d1d5db; padding: 3px 7px; border-radius: 4px; font-size: 11px;
+      font-weight: 500; flex-shrink: 0; white-space: nowrap; line-height: 1.4;
+      transition: all 0.12s;
+    }
+    .active-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .active-btn.on { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    .del-btn {
+      background: none; border: none; cursor: pointer; color: #d1d5db;
+      padding: 4px 6px; border-radius: 4px; font-size: 13px; flex-shrink: 0;
+    }
+    .del-btn:hover { background: #fee2e2; color: #dc2626; }
+
+    /* ── Add row ───────────────────────────────────────────── */
+    .add-row {
+      width: 100%; background: none; border: 2px dashed var(--border);
+      border-radius: 8px; padding: 11px 16px; margin-top: 8px;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--secondary); font-size: 13px; cursor: pointer; font-family: inherit;
+    }
+    .add-row:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* ── Modal ─────────────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .modal {
+      background: #fff; border-radius: 12px; width: 100%; max-width: 600px;
+      max-height: 88vh; overflow-y: auto; padding: 28px;
+    }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .modal-title-input {
+      font-size: 17px; font-weight: 700; color: var(--text); border: none; outline: none;
+      width: 100%; border-bottom: 2px solid transparent; padding-bottom: 2px;
+    }
+    .modal-title-input:focus { border-bottom-color: var(--orange); }
+    .close-btn { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 22px; line-height: 1; flex-shrink: 0; }
+    .close-btn:hover { color: var(--text); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .fg { display: flex; flex-direction: column; gap: 4px; }
+    .fg-full { margin-bottom: 16px; }
+    .fl {
+      font-size: 10px; font-weight: 700; color: var(--secondary);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .fsel, .fta, .fin {
+      border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px;
+      font-size: 13px; font-family: inherit; color: var(--text); outline: none;
+    }
+    .fsel:focus, .fta:focus, .fin:focus { border-color: var(--orange); }
+    .fta { resize: vertical; min-height: 72px; }
+    .fin { width: 100%; }
+
+    .active-toggle-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px; background: #f9fafb; border-radius: 8px;
+      margin-bottom: 16px; cursor: pointer; border: 1px solid var(--border);
+    }
+    .active-toggle-row.toggled { background: #fff7f4; border-color: var(--orange); }
+    .active-toggle-row input[type=checkbox] { accent-color: var(--orange); width: 16px; height: 16px; cursor: pointer; }
+    .active-toggle-label { font-size: 13px; font-weight: 600; cursor: pointer; }
+    .active-toggle-sub { font-size: 12px; color: var(--secondary); margin-left: auto; }
+
+    .modal-foot {
+      display: flex; justify-content: flex-end; gap: 8px;
+      margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    }
+    .btn-cancel {
+      padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--secondary);
+    }
+    .btn-save {
+      padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; background: var(--orange); color: #fff;
+    }
+    .btn-save:hover { background: var(--orange-hover); }
+
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      main { padding: 20px 12px 60px; }
+      .form-row { grid-template-columns: 1fr; }
+      .badges { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Gate ─────────────────────────────────────────────────── -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">Escape Collective</div>
+    <div class="gate-sub">Feature Pipeline · Internal</div>
+    <input type="password" id="gate-pw" class="gate-input" placeholder="Password" />
+    <button class="gate-btn" onclick="checkPw()">Enter →</button>
+    <div class="gate-err" id="gate-err">Incorrect password</div>
+  </div>
+</div>
+
+<!-- ── App ──────────────────────────────────────────────────── -->
+<header>
+  <span class="h-logo">Escape Collective</span>
+  <div class="h-div"></div>
+  <h1>Feature Pipeline</h1>
+  <div class="h-actions">
+    <button class="btn btn-ghost" onclick="exportData()">Export JSON</button>
+    <label class="btn btn-ghost" style="cursor:pointer">
+      Import
+      <input type="file" id="imp" accept=".json" onchange="importData(event)" style="display:none">
+    </label>
+    <button class="btn btn-primary" onclick="openAdd()">+ Add item</button>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <span class="toolbar-label">Priority order — drag to reorder</span>
+    <span class="item-count" id="count">0 items</span>
+    <div class="filters">
+      <span class="chip active" onclick="setFilter(this,'all')">All</span>
+      <span class="chip" onclick="setFilter(this,'active')">Active</span>
+      <span class="chip" onclick="setFilter(this,'blocked')">Blocked</span>
+      <span class="chip" onclick="setFilter(this,'parked')">Parked</span>
+    </div>
+  </div>
+
+  <ul class="pipeline" id="list"></ul>
+  <button class="add-row" onclick="openAdd()">＋ Add a feature</button>
+</main>
+
+<!-- ── Modal ────────────────────────────────────────────────── -->
+<div class="overlay hidden" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <input class="modal-title-input" id="m-title" placeholder="Feature title" />
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+
+    <label class="active-toggle-row" id="active-row" onclick="toggleActiveRow()">
+      <input type="checkbox" id="m-active" onclick="event.stopPropagation()" onchange="syncActiveRow()" />
+      <span class="active-toggle-label">Mark as active</span>
+      <span class="active-toggle-sub">Currently in progress</span>
+    </label>
+
+    <div class="fg-full">
+      <div class="fl">Description</div>
+      <textarea class="fta" id="m-desc" placeholder="What does this deliver?"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">Impact</label>
+        <select class="fsel" id="m-impact">
+          <option value="high">High</option>
+          <option value="med" selected>Med</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Complexity</label>
+        <select class="fsel" id="m-complexity">
+          <option value="low">Low</option>
+          <option value="med" selected>Med</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">Status</label>
+        <select class="fsel" id="m-status">
+          <option value="planned">Planned</option>
+          <option value="blocked">Blocked</option>
+          <option value="parked">Parked</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Origin</label>
+        <input class="fin" id="m-origin" placeholder="e.g. Release 2, Old P3…" style="height:37px" />
+      </div>
+    </div>
+    <div class="fg-full">
+      <div class="fl">Notes &amp; dependencies</div>
+      <textarea class="fta" id="m-notes" placeholder="Context, dependencies, open questions..."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────
+// Change PASSWORD to whatever you'd like, then re-upload to GitHub Pages.
+const PASSWORD = 'escape26';
+const STORE = 'ec_pipeline_v1';
+
+// ── Seed data (order reflects Jase's Aug 31 2026 prioritisation) ──
+const SEED = [
+  { id:'r2-follow', title:'Follow functionality',
+    description:'Follow primary tags and authors from tag, author, and article pages. Preferences screen to manage follows.',
+    impact:'high', complexity:'med', status:'planned', active:false,
+    notes:'Release 2 — Foundations. Needs preference storage and retrieval during browsing. Underpins customisable homepage and EscapeStack.',
+    origin:'Release 2' },
+
+  { id:'r2-homepage', title:'Customisable homepage',
+    description:'A user-preference-based feed alongside Latest, with the ability to swap between them. Also enables highlighted sections (e.g. Tour de France).',
+    impact:'high', complexity:'high', status:'planned', active:false,
+    notes:'Release 2 — Foundations. Follow functionality is a prerequisite. Open: how to serve the personalised feed performantly.',
+    origin:'Release 2' },
+
+  { id:'daily-news', title:'Daily news uplift',
+    description:'App-like daily news — swipeable cards, read/unread state, remembers position.',
+    impact:'high', complexity:'high', status:'planned', active:false,
+    notes:'Survey: 59% of members rate daily news as essential — tied with editorial articles as the top content priority. Wade sees it as a top-of-funnel acquisition tool. Needs internal editorial workflow definition.',
+    origin:'Old P5' },
+
+  { id:'native-app', title:'Native app (Capacitor) — iOS & Android',
+    description:'Pivot to native app development using Capacitor after site refresh. Wraps existing web app in a native shell — no rewrite. Solves iOS IAB issue and enables true deep linking on both platforms.',
+    impact:'high', complexity:'high', status:'planned', active:false,
+    notes:'Agreed with Wade in Aug 2026 catch-up. Priority immediately after site refresh ships. Target: end of 2026. Denis to implement using Capacitor — web-friendly, no prior native experience needed, compatible with existing PWA work. OneSignal Capacitor plugin available. Solves the IAB problem on iOS — strongest concrete driver.\n\nInvestigate Apple 30% tax: check whether current paid members are subject to it via in-app subscriptions, and whether web-only sign-up can route around it.',
+    origin:'Aug 2026 catch-up' },
+
+  { id:'member-benefits', title:'Member benefits uplift',
+    description:'Replace the list of plain buttons with a more engaging benefits experience (RCC app as reference).',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Survey: 33% of members cite member benefits access as essential — higher than the community forum (18%). Members feel they aren\'t accessing what they\'re paying for. High-value, relatively low-effort win.',
+    origin:'Old P3' },
+
+  { id:'member-purchase', title:'Member purchase program uplift',
+    description:'Better MPP interface with search/filter as the vendor count grows — current cards are heavy on mobile.',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'',
+    origin:'Old P3' },
+
+  { id:'bookmarks', title:'Bookmarks / read it later',
+    description:'Save posts to a personal read-later list with a management view.',
+    impact:'med', complexity:'high', status:'planned', active:false,
+    notes:'New feature — needs save/retrieve storage. Supports the 23% of members who cite offline access as a desired app benefit.',
+    origin:'Old P5' },
+
+  { id:'r2-announcements', title:'Announcements',
+    description:'An announcements page (feed) plus a dismissible homepage banner linking to each announcement. On-platform member comms channel.',
+    impact:'high', complexity:'med', status:'planned', active:false,
+    notes:'Release 2 — Foundations. Open question: Ghost\'s built-in banner may not support hyperlinks — may need a custom build.',
+    origin:'Release 2' },
+
+  { id:'comments-uplift', title:'Comments uplift',
+    description:'Review and improve the comment thread experience; the slide-in sidebar is up for revision.',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Survey: 32% of members rate post comments as essential — more than the forum (18%). Underrated in the pipeline relative to its member importance.',
+    origin:'Old P4' },
+
+  { id:'comments-platform', title:'Comments platform — Discourse migration',
+    description:'Review replacing Coral Comments with Discourse threads to consolidate community tools.',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.',
+    origin:'New idea' },
+
+  { id:'offline', title:'Offline reading',
+    description:'Read articles (likely bookmarked ones) without a connection.',
+    impact:'low', complexity:'high', status:'planned', active:false,
+    notes:'Survey: 23% cite offline access as a desired app benefit — more than push notifications (8%). Worth revisiting once Bookmarks ships.',
+    origin:'Old P5' },
+
+  { id:'author-featured', title:'Author pages — featured articles',
+    description:'Let authors pin 3–4 featured articles above their chronological list.',
+    impact:'low', complexity:'low', status:'planned', active:false,
+    notes:'Also relevant to EscapeStack.',
+    origin:'Old P4' },
+
+  { id:'author-banner', title:'Author page banner',
+    description:'A custom banner on author pages for personalisation and branding.',
+    impact:'low', complexity:'low', status:'planned', active:false,
+    notes:'Also relevant to EscapeStack.',
+    origin:'Old P4' },
+
+  { id:'follower-counts', title:'Follower counts',
+    description:'Show follower counts on author pages, possibly above a threshold.',
+    impact:'low', complexity:'low', status:'planned', active:false,
+    notes:'Depends on Follow shipping first (Release 2).',
+    origin:'Old P4' },
+
+  { id:'racing-overhaul', title:'Racing experience overhaul',
+    description:'Rich pre-race / in-race / post-race experience. "In Race" is the primary focus — live racing + community interaction. Post-race to consider HTRWW.',
+    impact:'high', complexity:'high', status:'planned', active:false,
+    notes:'Extends Release 1 Racing tab. Leans on race-data-api. Paused until more fully formed.\n\nTV Guide backend is a related dependency for pre-race HTRWW data.',
+    origin:'New idea' },
+
+  { id:'tv-guide', title:'TV Guide backend',
+    description:'Manage "how to watch" information centrally from the race calendar and expose throughout the site — race previews, annual calendar, etc.',
+    impact:'med', complexity:'high', status:'planned', active:false,
+    notes:'Feeds into Racing Experience overhaul for pre-race and in-race context.',
+    origin:'New idea' },
+
+  { id:'browse-tags', title:'Browse by primary tags',
+    description:'Browse and discover the back catalogue via primary tags and sub-tags (currently only via search).',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Closely related to Follow — could ride alongside Release 2.',
+    origin:'Old P3' },
+
+  { id:'account-consolidation', title:'Account consolidation',
+    description:'Consolidate scattered settings (Ghost, member benefits, forum, newsletter, push prefs) into one experience.',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Ties directly into the follow-preferences screen in Release 2.',
+    origin:'Old P3' },
+
+  { id:'galleries', title:'Galleries uplift',
+    description:'Mobile-optimised galleries — portrait images and vertical video, including from the homepage.',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Galleries achieve higher completion rates than articles. Team to produce more vertical video to support.',
+    origin:'Old P5' },
+
+  { id:'podcasts-homepage', title:'Podcasts on homepage',
+    description:'Surface podcasts on the homepage for discoverability — better than the current static panel.',
+    impact:'med', complexity:'low', status:'planned', active:false,
+    notes:'Survey: 31% rate podcasts as essential content.',
+    origin:'Old P4' },
+
+  { id:'merch', title:'Merch integration',
+    description:'At minimum link to the merch store in more places; deeper integration later.',
+    impact:'low', complexity:'low', status:'planned', active:false,
+    notes:'Survey: 6% rate merch as essential. Low priority. Supplier hosts their own store.',
+    origin:'Old P5' },
+
+  { id:'fantasy', title:'Fantasy integration',
+    description:'Expose/integrate Fantasy for discoverability. Leaderboard panel exists but needs a rethink for the new homepage design.',
+    impact:'med', complexity:'low', status:'planned', active:false,
+    notes:'Survey: 11% rate Fantasy as essential.',
+    origin:'Old P5' },
+
+  { id:'author-pronouns', title:'Author pronouns',
+    description:'A place to represent authors\' preferred pronouns on their profile.',
+    impact:'low', complexity:'low', status:'planned', active:false,
+    notes:'Requires a backend change for where pronouns are set.',
+    origin:'Old P5' },
+
+  { id:'bikegrid', title:'BikeGrid integration',
+    description:'Expose/integrate BikeGrid for discoverability.',
+    impact:'low', complexity:'med', status:'planned', active:false,
+    notes:'Survey: 7% rate BikeGrid as essential. Low member priority.',
+    origin:'Old P5' },
+
+  { id:'es-content', title:'EscapeStack — identifiable content',
+    description:'Visually differentiate EscapeStack content from core EC content across feeds, article and tag pages.',
+    impact:'med', complexity:'med', status:'blocked', active:false,
+    notes:'Blocked: EscapeStack concept not defined enough to progress.',
+    origin:'Old P1' },
+
+  { id:'es-contributors', title:'EscapeStack — identifiable contributors',
+    description:'Differentiate EscapeStack contributor author pages and profile presence from core staff.',
+    impact:'med', complexity:'med', status:'blocked', active:false,
+    notes:'Blocked: as above.',
+    origin:'Old P1' },
+
+  { id:'es-discovery', title:'EscapeStack — homepage discovery',
+    description:'A homepage area surfacing EscapeStack content, which won\'t hit the homepage by default.',
+    impact:'med', complexity:'med', status:'blocked', active:false,
+    notes:'Blocked: depends on EscapeStack definition.',
+    origin:'Old P3' },
+
+  { id:'weather', title:'Weather POC for cyclists',
+    description:'A proof of concept for a cyclist-focused weather feature.',
+    impact:'med', complexity:'med', status:'planned', active:false,
+    notes:'Novelty / utility value. Unvalidated demand — worth a quick POC before committing.',
+    origin:'New idea' },
+];
+
+// ── State ────────────────────────────────────────────────────
+let items = [];
+let editId = null;
+let filter = 'all';
+let didDrag = false;
+
+// ── Auth ─────────────────────────────────────────────────────
+function checkPw() {
+  const val = document.getElementById('gate-pw').value;
+  if (val === PASSWORD) {
+    sessionStorage.setItem('ec_pipeline_auth', '1');
+    document.getElementById('gate').classList.add('hidden');
+  } else {
+    document.getElementById('gate-err').style.display = 'block';
+    document.getElementById('gate-pw').value = '';
+    document.getElementById('gate-pw').focus();
+  }
+}
+document.getElementById('gate-pw').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+if (sessionStorage.getItem('ec_pipeline_auth') === '1') document.getElementById('gate').classList.add('hidden');
+
+// ── Data ─────────────────────────────────────────────────────
+function load() {
+  try {
+    const s = localStorage.getItem(STORE);
+    items = s ? JSON.parse(s) : [...SEED.map(i => ({...i}))];
+  } catch { items = [...SEED.map(i => ({...i}))]; }
+}
+function save() { localStorage.setItem(STORE, JSON.stringify(items)); }
+function uid() { return 'i' + Date.now() + Math.random().toString(36).slice(2,6); }
+
+// ── Render ───────────────────────────────────────────────────
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function impactLabel(v) { return { high:'↑ High', med:'~ Med', low:'↓ Low' }[v] || v; }
+
+function getVisible() {
+  if (filter === 'all') return items;
+  if (filter === 'active') return items.filter(i => i.active);
+  return items.filter(i => i.status === filter);
+}
+
+function render() {
+  const visible = getVisible();
+  document.getElementById('count').textContent = visible.length + ' item' + (visible.length !== 1 ? 's' : '');
+
+  document.getElementById('list').innerHTML = visible.map((item, idx) => `
+    <li class="p-item${item.active ? ' is-active' : ''}" data-id="${esc(item.id)}" onclick="itemClick(event,'${esc(item.id)}')">
+      <span class="drag" title="Drag to reorder">⠿</span>
+      <span class="rank">${idx + 1}</span>
+      <div class="item-body">
+        <div class="item-title">${esc(item.title)}</div>
+        <div class="item-desc">${esc(item.description)}</div>
+      </div>
+      <div class="badges">
+        ${item.active ? '<span class="badge badge-active">● Active</span>' : ''}
+        <span class="badge bi-${item.impact}">${impactLabel(item.impact)}</span>
+        <span class="badge bc-${item.complexity}">⚙ ${cap(item.complexity)}</span>
+        <span class="badge bs-${item.status}">${cap(item.status)}</span>
+      </div>
+      <button class="active-btn${item.active ? ' on' : ''}" onclick="toggleActive(event,'${esc(item.id)}')" title="${item.active ? 'Mark inactive' : 'Mark active'}">
+        ${item.active ? '● Active' : '○'}
+      </button>
+      <button class="del-btn" onclick="deleteItem(event,'${esc(item.id)}')" title="Remove">✕</button>
+    </li>
+  `).join('');
+
+  initSortable(visible);
+}
+
+let _sortable = null;
+function initSortable(visible) {
+  if (_sortable) { _sortable.destroy(); _sortable = null; }
+  _sortable = Sortable.create(document.getElementById('list'), {
+    animation: 140, handle: '.drag',
+    ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+    onStart: () => { didDrag = false; },
+    onMove: () => { didDrag = true; },
+    onEnd(evt) {
+      if (evt.oldIndex === evt.newIndex) { didDrag = false; return; }
+      const movedItem = visible[evt.oldIndex];
+      const targetItem = visible[evt.newIndex];
+      const fromIdx = items.indexOf(movedItem);
+      const toIdx = items.indexOf(targetItem);
+      items.splice(fromIdx, 1);
+      items.splice(toIdx, 0, movedItem);
+      save(); render();
+      setTimeout(() => { didDrag = false; }, 50);
+    }
+  });
+}
+
+function itemClick(e, id) {
+  if (didDrag) return;
+  if (e.target.classList.contains('drag') || e.target.classList.contains('del-btn') || e.target.classList.contains('active-btn')) return;
+  openEdit(id);
+}
+
+// ── Active toggle ────────────────────────────────────────────
+function toggleActive(e, id) {
+  e.stopPropagation();
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  item.active = !item.active;
+  save(); render();
+}
+
+// ── Filter ───────────────────────────────────────────────────
+function setFilter(el, f) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filter = f; render();
+}
+
+// ── Modal ────────────────────────────────────────────────────
+function syncActiveRow() {
+  const checked = document.getElementById('m-active').checked;
+  document.getElementById('active-row').classList.toggle('toggled', checked);
+}
+function toggleActiveRow() {
+  const cb = document.getElementById('m-active');
+  cb.checked = !cb.checked;
+  syncActiveRow();
+}
+
+function openAdd() {
+  editId = null;
+  document.getElementById('m-title').value = '';
+  document.getElementById('m-active').checked = false;
+  document.getElementById('m-desc').value = '';
+  document.getElementById('m-impact').value = 'med';
+  document.getElementById('m-complexity').value = 'med';
+  document.getElementById('m-status').value = 'planned';
+  document.getElementById('m-notes').value = '';
+  document.getElementById('m-origin').value = '';
+  syncActiveRow();
+  document.getElementById('overlay').classList.remove('hidden');
+  document.getElementById('m-title').focus();
+}
+
+function openEdit(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  editId = id;
+  document.getElementById('m-title').value = item.title;
+  document.getElementById('m-active').checked = !!item.active;
+  document.getElementById('m-desc').value = item.description;
+  document.getElementById('m-impact').value = item.impact;
+  document.getElementById('m-complexity').value = item.complexity;
+  document.getElementById('m-status').value = item.status;
+  document.getElementById('m-notes').value = item.notes || '';
+  document.getElementById('m-origin').value = item.origin || '';
+  syncActiveRow();
+  document.getElementById('overlay').classList.remove('hidden');
+  document.getElementById('m-title').focus();
+}
+
+function closeModal() { document.getElementById('overlay').classList.add('hidden'); editId = null; }
+function overlayClick(e) { if (e.target.id === 'overlay') closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function saveModal() {
+  const title = document.getElementById('m-title').value.trim();
+  if (!title) { document.getElementById('m-title').focus(); return; }
+  const d = {
+    title,
+    active: document.getElementById('m-active').checked,
+    description: document.getElementById('m-desc').value.trim(),
+    impact: document.getElementById('m-impact').value,
+    complexity: document.getElementById('m-complexity').value,
+    status: document.getElementById('m-status').value,
+    notes: document.getElementById('m-notes').value.trim(),
+    origin: document.getElementById('m-origin').value.trim(),
+  };
+  if (editId) {
+    const i = items.findIndex(x => x.id === editId);
+    if (i !== -1) items[i] = { ...items[i], ...d };
+  } else {
+    items.push({ id: uid(), ...d });
+  }
+  save(); closeModal(); render();
+}
+
+// ── Delete ───────────────────────────────────────────────────
+function deleteItem(e, id) {
+  e.stopPropagation();
+  if (!confirm('Remove this item from the pipeline?')) return;
+  items = items.filter(i => i.id !== id);
+  save(); render();
+}
+
+// ── Export / Import ──────────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ec-pipeline-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error();
+      items = data; save(); render();
+    } catch { alert('Could not read that file — make sure it\'s a pipeline export.'); }
+  };
+  reader.readAsText(file); e.target.value = '';
+}
+
+// ── Init ─────────────────────────────────────────────────────
+load(); render();
+</script>
+</body>
+</html>
