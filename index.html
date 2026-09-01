@@ -653,7 +653,9 @@ function ghHeaders() {
 
 async function loadFromGitHub() {
   try {
-    const r = await fetch(`${ghApiUrl()}?ref=${CONFIG.github.branch}`, { headers: ghHeaders() });
+    const r = await fetch(`${ghApiUrl()}?ref=${CONFIG.github.branch}`, {
+      headers: ghHeaders(), cache: 'no-store'
+    });
     if (!r.ok) return null;
     const d = await r.json();
     // Decode base64 (UTF-8 safe)
@@ -691,16 +693,19 @@ async function writeToGitHub() {
 
 // ── Data load / save ─────────────────────────────────────────
 async function loadData() {
-  if (ghConfigured()) {
-    const data = await loadFromGitHub();
-    if (data) { items = data; return; }
-  }
-  // Fallback: localStorage (admin only, or if GitHub not configured)
+  // Admin: localStorage is the source of truth for local edits.
+  // Load it first so a refresh doesn't lose unsaved work.
+  // Falls through to GitHub if nothing local, then seed.
   if (mode === 'admin') {
     try {
       const s = localStorage.getItem('ec_pipeline_v1');
       if (s) { items = JSON.parse(s); return; }
     } catch {}
+  }
+  // View (or admin with no local data): load from GitHub
+  if (ghConfigured()) {
+    const data = await loadFromGitHub();
+    if (data) { items = data; return; }
   }
   // Final fallback: seed
   items = SEED.map(i => ({...i}));
