@@ -238,9 +238,24 @@
   <div class="gate-box">
     <div class="gate-logo">Escape Collective</div>
     <div class="gate-sub" id="gate-sub">Feature Pipeline · Internal</div>
-    <input type="password" id="gate-pw" class="gate-input" placeholder="Password" />
-    <button class="gate-btn" onclick="checkPw()">Enter →</button>
-    <div class="gate-err" id="gate-err">Incorrect password</div>
+
+    <!-- Screen 1: password -->
+    <div id="gate-pw-screen">
+      <input type="password" id="gate-pw" class="gate-input" placeholder="Password" />
+      <button class="gate-btn" onclick="checkPw()">Enter →</button>
+      <div class="gate-err" id="gate-err">Incorrect password</div>
+    </div>
+
+    <!-- Screen 2: PAT (admin first run only) -->
+    <div id="gate-pat-screen" style="display:none">
+      <div style="font-size:13px;color:#9ca3af;margin-bottom:16px;text-align:left;line-height:1.5">
+        Enter your GitHub token to enable publishing.<br>
+        It's stored only on this device.
+      </div>
+      <input type="password" id="gate-token" class="gate-input" placeholder="github_pat_…" />
+      <button class="gate-btn" onclick="savePat()">Continue →</button>
+      <div class="gate-err" id="gate-pat-err">Token can't be empty</div>
+    </div>
   </div>
 </div>
 
@@ -251,6 +266,7 @@
   <h1 id="h-title">Feature Pipeline</h1>
   <span class="mode-badge" id="mode-badge" style="display:none"></span>
   <div class="h-actions">
+    <button class="btn btn-ghost" id="switch-btn" onclick="signOut()" style="display:none;font-size:12px;opacity:0.65">Switch</button>
     <button class="btn btn-ghost" onclick="exportData()">Export</button>
     <div id="admin-btns" style="display:flex;gap:8px">
       <label class="btn btn-ghost" style="cursor:pointer">
@@ -349,7 +365,7 @@ const CONFIG = {
   viewPassword:  'ec-view',              // Read-only password (share with stakeholders)
   adminPassword: 'escape26',             // Admin password (edit + publish)
   github: {
-    token:    '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',                         // GitHub PAT with contents:write — paste here
+    token:    '',                          // Leave blank — entered on first admin login, stored in browser
     owner:    'jasedepuit',               // GitHub username
     repo:     'ecpipeline',              // Repository name
     branch:   'main',
@@ -551,6 +567,10 @@ let didDrag = false;
 })();
 
 // ── Auth ─────────────────────────────────────────────────────
+function getToken() {
+  return CONFIG.github.token || localStorage.getItem('ec_gh_token') || '';
+}
+
 function checkPw() {
   const val = document.getElementById('gate-pw').value;
   const err = document.getElementById('gate-err');
@@ -563,11 +583,42 @@ function checkPw() {
     return;
   }
   err.style.display = 'none';
+  // Admin first run: prompt for PAT if not stored yet
+  if (mode === 'admin' && !getToken()) {
+    document.getElementById('gate-pw-screen').style.display = 'none';
+    document.getElementById('gate-pat-screen').style.display = '';
+    document.getElementById('gate-token').focus();
+    return;
+  }
   sessionStorage.setItem('ec_pipeline_mode', mode);
   document.getElementById('gate').classList.add('hidden');
   init();
 }
 document.getElementById('gate-pw').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+
+function savePat() {
+  const val = document.getElementById('gate-token').value.trim();
+  if (!val) {
+    document.getElementById('gate-pat-err').style.display = 'block';
+    return;
+  }
+  localStorage.setItem('ec_gh_token', val);
+  sessionStorage.setItem('ec_pipeline_mode', mode);
+  document.getElementById('gate').classList.add('hidden');
+  init();
+}
+document.getElementById('gate-token').addEventListener('keydown', e => { if (e.key === 'Enter') savePat(); });
+
+function signOut() {
+  sessionStorage.removeItem('ec_pipeline_mode');
+  mode = null;
+  // Reset gate to password screen
+  document.getElementById('gate-pw-screen').style.display = '';
+  document.getElementById('gate-pat-screen').style.display = 'none';
+  document.getElementById('gate-pw').value = '';
+  document.getElementById('gate-err').style.display = 'none';
+  document.getElementById('gate').classList.remove('hidden');
+}
 
 // ── Init ─────────────────────────────────────────────────────
 async function init() {
@@ -581,6 +632,8 @@ async function init() {
   document.getElementById('toolbar-label').textContent =
     mode === 'admin' ? 'Priority order — drag to reorder' : 'Priority order';
 
+  document.getElementById('switch-btn').style.display = '';
+
   await loadData();
   render();
 }
@@ -588,14 +641,14 @@ async function init() {
 // ── GitHub helpers ───────────────────────────────────────────
 function ghConfigured() {
   const gh = CONFIG.github;
-  return gh.token && gh.token !== '' && gh.owner && gh.repo;
+  return !!getToken() && gh.owner && gh.repo;
 }
 function ghApiUrl() {
   const { owner, repo, dataFile } = CONFIG.github;
   return `https://api.github.com/repos/${owner}/${repo}/contents/${dataFile}`;
 }
 function ghHeaders() {
-  return { 'Authorization': `Bearer ${CONFIG.github.token}`, 'Content-Type': 'application/json' };
+  return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
 }
 
 async function loadFromGitHub() {
