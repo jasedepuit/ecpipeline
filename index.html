@@ -639,9 +639,12 @@ async function init() {
 }
 
 // ── GitHub helpers ───────────────────────────────────────────
-function ghConfigured() {
+function ghReadable() {
   const gh = CONFIG.github;
-  return !!getToken() && gh.owner && gh.repo;
+  return !!(gh.owner && gh.repo);  // public repo — no token needed to read
+}
+function ghWritable() {
+  return !!(getToken() && CONFIG.github.owner && CONFIG.github.repo);
 }
 function ghApiUrl() {
   const { owner, repo, dataFile } = CONFIG.github;
@@ -652,17 +655,14 @@ function ghHeaders() {
 }
 
 async function loadFromGitHub() {
+  const { owner, repo, branch, dataFile } = CONFIG.github;
+  if (!owner || !repo) return null;
   try {
-    const r = await fetch(`${ghApiUrl()}?ref=${CONFIG.github.branch}&_=${Date.now()}`, {
-      headers: ghHeaders(), cache: 'no-store'
-    });
+    // Use raw URL — no token required for public repos, no base64 decoding needed
+    const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${dataFile}?_=${Date.now()}`;
+    const r = await fetch(url, { cache: 'no-store' });
     if (!r.ok) return null;
-    const d = await r.json();
-    // Decode base64 (UTF-8 safe)
-    const binary = atob(d.content.replace(/\s/g, ''));
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return JSON.parse(new TextDecoder().decode(bytes));
+    return await r.json();
   } catch { return null; }
 }
 
@@ -703,7 +703,7 @@ async function loadData() {
     } catch {}
   }
   // View (or admin with no local data): load from GitHub
-  if (ghConfigured()) {
+  if (ghReadable()) {
     const data = await loadFromGitHub();
     if (data) { items = data; return; }
   }
@@ -717,7 +717,7 @@ function saveLocal() {
 
 async function publishData() {
   const btn = document.getElementById('publish-btn');
-  if (!ghConfigured()) {
+  if (!ghWritable()) {
     // GitHub not set up — local save only
     saveLocal();
     btn.textContent = 'Saved locally ✓';
