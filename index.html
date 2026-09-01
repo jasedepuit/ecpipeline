@@ -655,14 +655,21 @@ function ghHeaders() {
 }
 
 async function loadFromGitHub() {
-  const { owner, repo, branch, dataFile } = CONFIG.github;
+  const { owner, repo, branch } = CONFIG.github;
   if (!owner || !repo) return null;
   try {
-    // Use raw URL — no token required for public repos, no base64 decoding needed
-    const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${dataFile}?_=${Date.now()}`;
-    const r = await fetch(url, { cache: 'no-store' });
+    // GitHub Contents API — no CDN cache, no token required for public repos
+    const url = `${ghApiUrl()}?ref=${branch}&_=${Date.now()}`;
+    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    const token = getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const r = await fetch(url, { headers, cache: 'no-store' });
     if (!r.ok) return null;
-    return await r.json();
+    const d = await r.json();
+    const binary = atob(d.content.replace(/\s/g, ''));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
   } catch { return null; }
 }
 
