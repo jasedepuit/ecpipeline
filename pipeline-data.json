@@ -1,16 +1,5 @@
 [
   {
-    "id": "r2-follow",
-    "title": "Follow functionality",
-    "description": "Follow primary tags and authors from tag, author, and article pages. Preferences screen to manage follows.",
-    "impact": "high",
-    "complexity": "med",
-    "status": "planned",
-    "active": true,
-    "notes": "Release 2 — Foundations. Needs preference storage and retrieval during browsing. Closely coupled with Homepage feed filter — following is most impactful when it visibly affects the homepage experience.",
-    "origin": "Release 2"
-  },
-  {
     "id": "author-featured",
     "title": "Author pages — featured articles",
     "description": "Let authors pin 3–4 featured articles above their chronological list.",
@@ -20,6 +9,17 @@
     "active": false,
     "notes": "Quick win. Also relevant to EscapeStack.",
     "origin": "Old P4"
+  },
+  {
+    "id": "r2-follow",
+    "title": "Follow functionality",
+    "description": "Follow primary tags and authors from tag, author, and article pages. Preferences screen to manage follows.",
+    "impact": "high",
+    "complexity": "med",
+    "status": "planned",
+    "active": true,
+    "notes": "Release 2 — Foundations. Needs preference storage and retrieval during browsing. Closely coupled with Homepage feed filter — following is most impactful when it visibly affects the homepage experience.",
+    "origin": "Release 2"
   },
   {
     "id": "bookmarks",
