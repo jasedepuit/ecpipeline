@@ -6,7 +6,7 @@
     "impact": "high",
     "complexity": "med",
     "status": "planned",
-    "active": true,
+    "active": false,
     "notes": "Release 2 — Foundations. Needs preference storage and retrieval during browsing. Closely coupled with Homepage feed filter — following is most impactful when it visibly affects the homepage experience.",
     "origin": "Release 2"
   },
