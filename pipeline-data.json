@@ -77,17 +77,6 @@
     "origin": "Release 2"
   },
   {
-    "id": "i1788500586844dppf",
-    "title": "Podcast Page Merchandising",
-    "active": false,
-    "description": "Expose podcast content in a more compelling and explorative fashion to demonstrate our offering while still allowing easy subscription within podcast apps.",
-    "impact": "med",
-    "complexity": "med",
-    "status": "planned",
-    "notes": "",
-    "origin": ""
-  },
-  {
     "id": "racing-overhaul",
     "title": "Racing experience overhaul",
     "description": "Rich pre-race / in-race / post-race experience. \"In Race\" is the primary focus — live racing + community interaction. Post-race to consider HTRWW.",
@@ -110,17 +99,6 @@
     "origin": "Old P3"
   },
   {
-    "id": "podcasts-homepage",
-    "title": "Podcasts on homepage",
-    "description": "Surface podcasts on the homepage for discoverability — better than the current static panel.",
-    "impact": "med",
-    "complexity": "low",
-    "status": "planned",
-    "active": false,
-    "notes": "Survey: 31% rate podcasts as essential content.",
-    "origin": "Old P4"
-  },
-  {
     "id": "r2-announcements",
     "title": "Announcements",
     "description": "An announcements page (feed) plus a dismissible homepage banner linking to each announcement. On-platform member comms channel.",
@@ -130,6 +108,28 @@
     "active": false,
     "notes": "Release 2 — Foundations. Open question: Ghost's built-in banner may not support hyperlinks — may need a custom build.",
     "origin": "Release 2"
+  },
+  {
+    "id": "i1788500586844dppf",
+    "title": "Podcast Page Merchandising",
+    "active": false,
+    "description": "Expose podcast content in a more compelling and explorative fashion to demonstrate our offering while still allowing easy subscription within podcast apps.",
+    "impact": "med",
+    "complexity": "med",
+    "status": "planned",
+    "notes": "",
+    "origin": ""
+  },
+  {
+    "id": "podcasts-homepage",
+    "title": "Podcasts on homepage",
+    "description": "Surface podcasts on the homepage for discoverability — better than the current static panel.",
+    "impact": "med",
+    "complexity": "low",
+    "status": "planned",
+    "active": false,
+    "notes": "Survey: 31% rate podcasts as essential content.",
+    "origin": "Old P4"
   },
   {
     "id": "comments-uplift",
