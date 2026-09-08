@@ -784,7 +784,7 @@ function render() {
         <span class="badge bs-${item.status}">${cap(item.status)}</span>
       </div>
       <button class="active-btn${item.active ? ' on' : ''}" onclick="toggleActive(event,'${esc(item.id)}')" title="${item.active ? 'Mark inactive' : 'Mark active'}">
-        ${item.active ? '● Active' : '○'}
+        ${item.active ? '●' : '○'}
       </button>
       <button class="del-btn" onclick="deleteItem(event,'${esc(item.id)}')" title="Remove">✕</button>
     </li>
