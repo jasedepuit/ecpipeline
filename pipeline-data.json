@@ -39,7 +39,7 @@
     "impact": "high",
     "complexity": "high",
     "status": "planned",
-    "active": false,
+    "active": true,
     "notes": "Survey: 59% of members rate daily news as essential — tied with editorial articles as the top content priority. Wade sees it as a top-of-funnel acquisition tool. Needs internal editorial workflow definition.",
     "origin": "Old P5"
   },
