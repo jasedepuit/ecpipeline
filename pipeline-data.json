@@ -77,6 +77,28 @@
     "origin": "Release 2"
   },
   {
+    "id": "comments-platform",
+    "title": "Comments platform — Discourse migration",
+    "description": "Review replacing Coral Comments with Discourse threads to consolidate community tools.",
+    "impact": "med",
+    "complexity": "med",
+    "status": "planned",
+    "active": false,
+    "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
+    "origin": "New idea"
+  },
+  {
+    "id": "i1789001768470clqn",
+    "title": "Forum - Usage and Category Audit",
+    "active": false,
+    "description": "Consolidate or remove unused category bloat. Changing permissions.",
+    "impact": "med",
+    "complexity": "low",
+    "status": "planned",
+    "notes": "",
+    "origin": ""
+  },
+  {
     "id": "racing-overhaul",
     "title": "Racing experience overhaul",
     "description": "Rich pre-race / in-race / post-race experience. \"In Race\" is the primary focus — live racing + community interaction. Post-race to consider HTRWW.",
@@ -119,17 +141,6 @@
     "status": "planned",
     "notes": "",
     "origin": ""
-  },
-  {
-    "id": "comments-platform",
-    "title": "Comments platform — Discourse migration",
-    "description": "Review replacing Coral Comments with Discourse threads to consolidate community tools.",
-    "impact": "med",
-    "complexity": "med",
-    "status": "planned",
-    "active": false,
-    "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
-    "origin": "New idea"
   },
   {
     "id": "podcasts-homepage",
