@@ -17,7 +17,7 @@
     "impact": "low",
     "complexity": "low",
     "status": "planned",
-    "active": false,
+    "active": true,
     "notes": "Quick win. Also relevant to EscapeStack.",
     "origin": "Old P4"
   },
@@ -121,6 +121,17 @@
     "origin": ""
   },
   {
+    "id": "comments-platform",
+    "title": "Comments platform — Discourse migration",
+    "description": "Review replacing Coral Comments with Discourse threads to consolidate community tools.",
+    "impact": "med",
+    "complexity": "med",
+    "status": "planned",
+    "active": false,
+    "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
+    "origin": "New idea"
+  },
+  {
     "id": "podcasts-homepage",
     "title": "Podcasts on homepage",
     "description": "Surface podcasts on the homepage for discoverability — better than the current static panel.",
@@ -141,17 +152,6 @@
     "active": false,
     "notes": "Survey: 32% of members rate post comments as essential — more than the forum (18%). Underrated in the pipeline relative to its member importance.",
     "origin": "Old P4"
-  },
-  {
-    "id": "comments-platform",
-    "title": "Comments platform — Discourse migration",
-    "description": "Review replacing Coral Comments with Discourse threads to consolidate community tools.",
-    "impact": "med",
-    "complexity": "med",
-    "status": "planned",
-    "active": false,
-    "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
-    "origin": "New idea"
   },
   {
     "id": "offline",
