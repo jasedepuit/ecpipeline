@@ -99,6 +99,17 @@
     "origin": ""
   },
   {
+    "id": "i1789022614963nhhr",
+    "title": "Improve Site Search",
+    "active": false,
+    "description": "Way more intuitive and accurate search results from the native search bar.",
+    "impact": "med",
+    "complexity": "low",
+    "status": "planned",
+    "notes": "Outpost integration does the hard work, we just need to style and config it.",
+    "origin": ""
+  },
+  {
     "id": "racing-overhaul",
     "title": "Racing experience overhaul",
     "description": "Rich pre-race / in-race / post-race experience. \"In Race\" is the primary focus — live racing + community interaction. Post-race to consider HTRWW.",
