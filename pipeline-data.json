@@ -1,5 +1,16 @@
 [
   {
+    "id": "i1789001768470clqn",
+    "title": "Forum - Usage and Category Audit",
+    "active": true,
+    "description": "Consolidate or remove unused category bloat. Changing permissions.",
+    "impact": "med",
+    "complexity": "low",
+    "status": "planned",
+    "notes": "",
+    "origin": ""
+  },
+  {
     "id": "r2-follow",
     "title": "Follow functionality",
     "description": "Follow primary tags and authors from tag, author, and article pages. Preferences screen to manage follows.",
@@ -86,17 +97,6 @@
     "active": false,
     "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
     "origin": "New idea"
-  },
-  {
-    "id": "i1789001768470clqn",
-    "title": "Forum - Usage and Category Audit",
-    "active": false,
-    "description": "Consolidate or remove unused category bloat. Changing permissions.",
-    "impact": "med",
-    "complexity": "low",
-    "status": "planned",
-    "notes": "",
-    "origin": ""
   },
   {
     "id": "i1789022614963nhhr",
