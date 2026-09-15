@@ -105,6 +105,8 @@
     }
     .p-item:hover { border-color: #cdd0d8; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .p-item.is-active { border-left: 3px solid var(--orange); padding-left: 11px; }
+    .p-item.is-done .item-title { color: var(--secondary); }
+    .p-item.is-done .rank { opacity: 0.4; }
     .p-item.sortable-ghost { opacity: 0.35; background: #f0f2f5; }
     .p-item.sortable-chosen { box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-color: #cdd0d8; }
 
@@ -127,6 +129,7 @@
     .bs-blocked { background: #fee2e2; color: #991b1b; }
     .bs-parked  { background: #f3f4f6; color: #9ca3af; }
     .bs-planned { display: none; }
+    .bs-done    { background: #166534; color: #fff; }
     .badge-active { background: var(--orange); color: #fff; }
 
     .active-btn {
@@ -137,6 +140,9 @@
     }
     .active-btn:hover { border-color: var(--orange); color: var(--orange); }
     .active-btn.on { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    .active-btn-spacer { display: inline-block; width: 23px; flex-shrink: 0; }
+    body[data-mode="view"] .active-btn-spacer { display: none !important; }
 
     .del-btn {
       background: none; border: none; cursor: pointer; color: #d1d5db;
@@ -288,6 +294,7 @@
       <span class="chip" onclick="setFilter(this,'active')">Active</span>
       <span class="chip" onclick="setFilter(this,'blocked')">Blocked</span>
       <span class="chip" onclick="setFilter(this,'parked')">Parked</span>
+      <span class="chip" onclick="setFilter(this,'done')">Done</span>
     </div>
   </div>
 
@@ -334,10 +341,11 @@
     <div class="form-row">
       <div class="fg">
         <label class="fl">Status</label>
-        <select class="fsel" id="m-status">
+        <select class="fsel" id="m-status" onchange="statusChanged()">
           <option value="planned">Planned</option>
           <option value="blocked">Blocked</option>
           <option value="parked">Parked</option>
+          <option value="done">Done</option>
         </select>
       </div>
       <div class="fg">
@@ -760,8 +768,8 @@ function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 function impactLabel(v) { return { high:'↑ High', med:'~ Med', low:'↓ Low' }[v] || v; }
 
 function getVisible() {
-  if (filter === 'all')    return items;
-  if (filter === 'active') return items.filter(i => i.active);
+  if (filter === 'all')    return items.filter(i => i.status !== 'done');
+  if (filter === 'active') return items.filter(i => i.active && i.status !== 'done');
   return items.filter(i => i.status === filter);
 }
 
@@ -770,7 +778,7 @@ function render() {
   document.getElementById('count').textContent = visible.length + ' item' + (visible.length !== 1 ? 's' : '');
 
   document.getElementById('list').innerHTML = visible.map((item, idx) => `
-    <li class="p-item${item.active ? ' is-active' : ''}" data-id="${esc(item.id)}" onclick="itemClick(event,'${esc(item.id)}')">
+    <li class="p-item${item.active ? ' is-active' : ''}${item.status === 'done' ? ' is-done' : ''}" data-id="${esc(item.id)}" onclick="itemClick(event,'${esc(item.id)}')">
       <span class="drag" title="Drag to reorder">⠿</span>
       <span class="rank">${idx + 1}</span>
       <div class="item-body">
@@ -783,9 +791,10 @@ function render() {
         <span class="badge bc-${item.complexity}">Complexity: ${cap(item.complexity)}</span>
         <span class="badge bs-${item.status}">${cap(item.status)}</span>
       </div>
+      ${item.status === 'done' ? '<span class="active-btn-spacer"></span>' : `
       <button class="active-btn${item.active ? ' on' : ''}" onclick="toggleActive(event,'${esc(item.id)}')" title="${item.active ? 'Mark inactive' : 'Mark active'}">
         ${item.active ? '●' : '○'}
-      </button>
+      </button>`}
       <button class="del-btn" onclick="deleteItem(event,'${esc(item.id)}')" title="Remove">✕</button>
     </li>
   `).join('');
@@ -840,6 +849,12 @@ function setFilter(el, f) {
 }
 
 // ── Modal ────────────────────────────────────────────────────
+function statusChanged() {
+  if (document.getElementById('m-status').value === 'done') {
+    document.getElementById('m-active').checked = false;
+    syncActiveRow();
+  }
+}
 function syncActiveRow() {
   const checked = document.getElementById('m-active').checked;
   document.getElementById('active-row').classList.toggle('toggled', checked);
@@ -889,13 +904,14 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 function saveModal() {
   const title = document.getElementById('m-title').value.trim();
   if (!title) { document.getElementById('m-title').focus(); return; }
+  const st = document.getElementById('m-status').value;
   const d = {
     title,
-    active:      document.getElementById('m-active').checked,
+    active:      st === 'done' ? false : document.getElementById('m-active').checked,
     description: document.getElementById('m-desc').value.trim(),
     impact:      document.getElementById('m-impact').value,
     complexity:  document.getElementById('m-complexity').value,
-    status:      document.getElementById('m-status').value,
+    status:      st,
     notes:       document.getElementById('m-notes').value.trim(),
     origin:      document.getElementById('m-origin').value.trim(),
   };
