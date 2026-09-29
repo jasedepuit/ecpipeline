@@ -2,11 +2,11 @@
   {
     "id": "i1789001768470clqn",
     "title": "Forum - Usage and Category Audit",
-    "active": true,
+    "active": false,
     "description": "Consolidate or remove unused category bloat. Changing permissions.",
     "impact": "med",
     "complexity": "low",
-    "status": "planned",
+    "status": "done",
     "notes": "",
     "origin": ""
   },
@@ -17,7 +17,7 @@
     "impact": "high",
     "complexity": "med",
     "status": "planned",
-    "active": false,
+    "active": true,
     "notes": "Release 2 — Foundations. Needs preference storage and retrieval during browsing. Closely coupled with Homepage feed filter — following is most impactful when it visibly affects the homepage experience.",
     "origin": "Release 2"
   },
@@ -27,8 +27,8 @@
     "description": "Let authors pin 3–4 featured articles above their chronological list.",
     "impact": "low",
     "complexity": "low",
-    "status": "planned",
-    "active": true,
+    "status": "done",
+    "active": false,
     "notes": "Quick win. Also relevant to EscapeStack.",
     "origin": "Old P4"
   },
