@@ -33,6 +33,17 @@
     "origin": "Old P4"
   },
   {
+    "id": "r2-homepage",
+    "title": "Homepage feed filter (follow-based)",
+    "description": "Tag/author filter applied to the top section of the homepage, based on who you follow. Lets members quickly surface content from their favourite tags or authors without changing the full homepage layout.",
+    "impact": "high",
+    "complexity": "med",
+    "status": "planned",
+    "active": true,
+    "notes": "Agreed scope (Aug 31 2026): NOT full homepage layout customisation — just a filter on the top section based on followed tags/authors. Also enables EC-curated collections (e.g. \"Tour de France\"). Follow functionality is a prerequisite.\n\nWade's concern about complexity was resolved once the narrower scope was clarified. Start with tag filtering; author filtering can follow.",
+    "origin": "Release 2"
+  },
+  {
     "id": "bookmarks",
     "title": "Bookmarks / read it later",
     "description": "Save posts to a personal read-later list with a management view.",
@@ -75,17 +86,6 @@
     "active": false,
     "notes": "Agreed with Wade in Aug 2026 catch-up. Priority immediately after site refresh ships. Target: end of 2026. Denis to implement using Capacitor — web-friendly, no prior native experience needed, compatible with existing PWA work. OneSignal Capacitor plugin available. Solves the IAB problem on iOS — strongest concrete driver.\n\nInvestigate Apple 30% tax: check whether current paid members are subject to it via in-app subscriptions, and whether web-only sign-up can route around it.",
     "origin": "Aug 2026 catch-up"
-  },
-  {
-    "id": "r2-homepage",
-    "title": "Homepage feed filter (follow-based)",
-    "description": "Tag/author filter applied to the top section of the homepage, based on who you follow. Lets members quickly surface content from their favourite tags or authors without changing the full homepage layout.",
-    "impact": "high",
-    "complexity": "med",
-    "status": "planned",
-    "active": false,
-    "notes": "Agreed scope (Aug 31 2026): NOT full homepage layout customisation — just a filter on the top section based on followed tags/authors. Also enables EC-curated collections (e.g. \"Tour de France\"). Follow functionality is a prerequisite.\n\nWade's concern about complexity was resolved once the narrower scope was clarified. Start with tag filtering; author filtering can follow.",
-    "origin": "Release 2"
   },
   {
     "id": "comments-platform",
