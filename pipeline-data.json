@@ -101,7 +101,7 @@
   {
     "id": "i1789022614963nhhr",
     "title": "Improve Site Search",
-    "active": false,
+    "active": true,
     "description": "Way more intuitive and accurate search results from the native search bar.",
     "impact": "med",
     "complexity": "low",
