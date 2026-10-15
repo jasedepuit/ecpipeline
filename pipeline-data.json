@@ -19,7 +19,9 @@
     "status": "planned",
     "active": true,
     "notes": "Release 2 — Foundations. Needs preference storage and retrieval during browsing. Closely coupled with Homepage feed filter — following is most impactful when it visibly affects the homepage experience.",
-    "origin": "Release 2"
+    "origin": "Release 2",
+    "target": "2026-10-21",
+    "targetKind": "scope"
   },
   {
     "id": "author-featured",
@@ -41,7 +43,9 @@
     "status": "planned",
     "active": true,
     "notes": "Agreed scope (Aug 31 2026): NOT full homepage layout customisation — just a filter on the top section based on followed tags/authors. Also enables EC-curated collections (e.g. \"Tour de France\"). Follow functionality is a prerequisite.\n\nWade's concern about complexity was resolved once the narrower scope was clarified. Start with tag filtering; author filtering can follow.",
-    "origin": "Release 2"
+    "origin": "Release 2",
+    "target": "2026-10-21",
+    "targetKind": "scope"
   },
   {
     "id": "bookmarks",
@@ -52,7 +56,9 @@
     "status": "planned",
     "active": false,
     "notes": "New feature — needs save/retrieve storage. Supports the 23% of members who cite offline access as a desired app benefit.",
-    "origin": "Old P5"
+    "origin": "Old P5",
+    "target": "2026-10-30",
+    "targetKind": "scope"
   },
   {
     "id": "daily-news",
@@ -63,7 +69,9 @@
     "status": "planned",
     "active": true,
     "notes": "Survey: 59% of members rate daily news as essential — tied with editorial articles as the top content priority. Wade sees it as a top-of-funnel acquisition tool. Needs internal editorial workflow definition.",
-    "origin": "Old P5"
+    "origin": "Old P5",
+    "target": "2026-10-30",
+    "targetKind": "scope"
   },
   {
     "id": "member-benefits",
@@ -74,7 +82,9 @@
     "status": "planned",
     "active": false,
     "notes": "Survey: 33% of members cite member benefits access as essential — higher than the community forum (18%). Members feel they aren't accessing what they're paying for. High-value, relatively low-effort win.",
-    "origin": "Old P3"
+    "origin": "Old P3",
+    "target": "2026-11-06",
+    "targetKind": "scope"
   },
   {
     "id": "native-app",
@@ -85,7 +95,9 @@
     "status": "planned",
     "active": true,
     "notes": "Agreed with Wade in Aug 2026 catch-up. Priority immediately after site refresh ships. Target: end of 2026. Denis to implement using Capacitor — web-friendly, no prior native experience needed, compatible with existing PWA work. OneSignal Capacitor plugin available. Solves the IAB problem on iOS — strongest concrete driver.\n\nInvestigate Apple 30% tax: check whether current paid members are subject to it via in-app subscriptions, and whether web-only sign-up can route around it.",
-    "origin": "Aug 2026 catch-up"
+    "origin": "Aug 2026 catch-up",
+    "target": "2026-10-23",
+    "targetKind": "scope"
   },
   {
     "id": "comments-platform",
@@ -96,7 +108,9 @@
     "status": "planned",
     "active": false,
     "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
-    "origin": "New idea"
+    "origin": "New idea",
+    "target": "2026-10-30",
+    "targetKind": "scope"
   },
   {
     "id": "i1789022614963nhhr",
@@ -107,7 +121,9 @@
     "complexity": "low",
     "status": "planned",
     "notes": "Outpost integration does the hard work, we just need to style and config it.",
-    "origin": ""
+    "origin": "",
+    "target": "2026-10-23",
+    "targetKind": "deliver"
   },
   {
     "id": "racing-overhaul",
@@ -118,7 +134,9 @@
     "status": "planned",
     "active": false,
     "notes": "Extends Release 1 Racing tab. Leans on race-data-api. Paused until more fully formed.\n\nTV Guide backend is a related dependency for pre-race HTRWW data.",
-    "origin": "New idea"
+    "origin": "New idea",
+    "target": "2026-11-27",
+    "targetKind": "scope"
   },
   {
     "id": "member-purchase",
@@ -129,7 +147,9 @@
     "status": "planned",
     "active": false,
     "notes": "",
-    "origin": "Old P3"
+    "origin": "Old P3",
+    "target": "2026-11-13",
+    "targetKind": "scope"
   },
   {
     "id": "r2-announcements",
