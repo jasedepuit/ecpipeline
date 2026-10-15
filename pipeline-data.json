@@ -83,7 +83,7 @@
     "impact": "high",
     "complexity": "high",
     "status": "planned",
-    "active": false,
+    "active": true,
     "notes": "Agreed with Wade in Aug 2026 catch-up. Priority immediately after site refresh ships. Target: end of 2026. Denis to implement using Capacitor — web-friendly, no prior native experience needed, compatible with existing PWA work. OneSignal Capacitor plugin available. Solves the IAB problem on iOS — strongest concrete driver.\n\nInvestigate Apple 30% tax: check whether current paid members are subject to it via in-app subscriptions, and whether web-only sign-up can route around it.",
     "origin": "Aug 2026 catch-up"
   },
