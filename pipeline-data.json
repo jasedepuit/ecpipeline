@@ -11,6 +11,19 @@
     "origin": ""
   },
   {
+    "id": "i1792043575676hx64",
+    "title": "Bottom Nav for Mobile Web",
+    "active": true,
+    "description": "Add bottom nav to mobile web in addition to the PWA",
+    "impact": "med",
+    "complexity": "med",
+    "status": "planned",
+    "target": "2026-10-23",
+    "targetKind": "deliver",
+    "notes": "",
+    "origin": ""
+  },
+  {
     "id": "r2-follow",
     "title": "Follow functionality",
     "description": "Follow primary tags and authors from tag, author, and article pages. Preferences screen to manage follows.",
