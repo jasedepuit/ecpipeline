@@ -132,6 +132,14 @@
     .bs-done    { background: #166534; color: #fff; }
     .badge-active { background: var(--orange); color: #fff; }
 
+    .target {
+      font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+      white-space: nowrap; flex-shrink: 0; background: #eef2ff; color: #3730a3;
+    }
+    .target.scope { background: #f3f4f6; color: #4b5563; font-weight: 500; }
+    .target.late  { background: #fee2e2; color: #991b1b; }
+    .target.none  { background: none; color: #d1d5db; font-weight: 500; }
+
     .active-btn {
       background: none; border: 1px solid var(--border); cursor: pointer;
       color: #d1d5db; padding: 3px 7px; border-radius: 4px; font-size: 11px;
@@ -351,6 +359,19 @@
       <div class="fg">
         <label class="fl">Origin</label>
         <input class="fin" id="m-origin" placeholder="e.g. Release 2, Old P3…" style="height:37px" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label class="fl">Target date</label>
+        <input class="fin" type="date" id="m-target" style="height:37px" />
+      </div>
+      <div class="fg">
+        <label class="fl">Date means</label>
+        <select class="fsel" id="m-targetkind">
+          <option value="deliver">Delivery</option>
+          <option value="scope">Scope &amp; estimate by</option>
+        </select>
       </div>
     </div>
     <div class="fg-full">
@@ -767,6 +788,24 @@ function esc(s) {
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 function impactLabel(v) { return { high:'↑ High', med:'~ Med', low:'↓ Low' }[v] || v; }
 
+function fmtTarget(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const thisYear = new Date().getFullYear();
+  return d + ' ' + months[m - 1] + (y !== thisYear ? ' ' + String(y).slice(2) : '');
+}
+function targetBadge(item) {
+  if (item.status === 'done') return '';
+  if (!item.target) return '<span class="target none" title="No target date set">—</span>';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const [y, m, d] = item.target.split('-').map(Number);
+  const late  = new Date(y, m - 1, d) < today;
+  const scope = item.targetKind === 'scope';
+  const cls   = 'target' + (late ? ' late' : (scope ? ' scope' : ''));
+  const title = scope ? 'Scope and estimate by this date' : 'Target delivery';
+  return `<span class="${cls}" title="${title}">${scope ? 'Scope by ' : ''}${fmtTarget(item.target)}</span>`;
+}
+
 function getVisible() {
   if (filter === 'all')    return items.filter(i => i.status !== 'done');
   if (filter === 'active') return items.filter(i => i.active && i.status !== 'done');
@@ -785,6 +824,7 @@ function render() {
         <div class="item-title">${esc(item.title)}</div>
         <div class="item-desc">${esc(item.description)}</div>
       </div>
+      ${targetBadge(item)}
       <div class="badges">
         ${item.active ? '<span class="badge badge-active">● Active</span>' : ''}
         <span class="badge bi-${item.impact}">Impact: ${impactLabel(item.impact)}</span>
@@ -873,6 +913,8 @@ function openAdd() {
   document.getElementById('m-impact').value     = 'med';
   document.getElementById('m-complexity').value = 'med';
   document.getElementById('m-status').value     = 'planned';
+  document.getElementById('m-target').value     = '';
+  document.getElementById('m-targetkind').value = 'deliver';
   document.getElementById('m-notes').value      = '';
   document.getElementById('m-origin').value     = '';
   syncActiveRow();
@@ -890,6 +932,8 @@ function openEdit(id) {
   document.getElementById('m-impact').value     = item.impact;
   document.getElementById('m-complexity').value = item.complexity;
   document.getElementById('m-status').value     = item.status;
+  document.getElementById('m-target').value     = item.target || '';
+  document.getElementById('m-targetkind').value = item.targetKind || 'deliver';
   document.getElementById('m-notes').value      = item.notes || '';
   document.getElementById('m-origin').value     = item.origin || '';
   syncActiveRow();
@@ -912,6 +956,8 @@ function saveModal() {
     impact:      document.getElementById('m-impact').value,
     complexity:  document.getElementById('m-complexity').value,
     status:      st,
+    target:      document.getElementById('m-target').value,
+    targetKind:  document.getElementById('m-targetkind').value,
     notes:       document.getElementById('m-notes').value.trim(),
     origin:      document.getElementById('m-origin').value.trim(),
   };
