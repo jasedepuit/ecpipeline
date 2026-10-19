@@ -62,15 +62,15 @@
   },
   {
     "id": "bookmarks",
-    "title": "Bookmarks / read it later",
+    "title": "Saved Articles (Read it later)",
     "description": "Save posts to a personal read-later list with a management view.",
     "impact": "med",
     "complexity": "med",
     "status": "planned",
-    "active": false,
+    "active": true,
     "notes": "New feature — needs save/retrieve storage. Supports the 23% of members who cite offline access as a desired app benefit.",
     "origin": "Old P5",
-    "target": "2026-10-30",
+    "target": "2026-10-21",
     "targetKind": "scope"
   },
   {
