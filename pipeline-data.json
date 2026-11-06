@@ -13,11 +13,11 @@
   {
     "id": "i1792043575676hx64",
     "title": "Bottom Nav for Mobile Web",
-    "active": true,
+    "active": false,
     "description": "Add bottom nav to mobile web in addition to the PWA",
     "impact": "med",
     "complexity": "med",
-    "status": "planned",
+    "status": "done",
     "target": "2026-10-23",
     "targetKind": "deliver",
     "notes": "",
@@ -79,8 +79,8 @@
     "description": "App-like daily news — swipeable cards, read/unread state, remembers position.",
     "impact": "high",
     "complexity": "high",
-    "status": "planned",
-    "active": true,
+    "status": "blocked",
+    "active": false,
     "notes": "Survey: 59% of members rate daily news as essential — tied with editorial articles as the top content priority. Wade sees it as a top-of-funnel acquisition tool. Needs internal editorial workflow definition.",
     "origin": "Old P5",
     "target": "2026-10-30",
@@ -109,7 +109,7 @@
     "active": false,
     "notes": "Survey: 33% of members cite member benefits access as essential — higher than the community forum (18%). Members feel they aren't accessing what they're paying for. High-value, relatively low-effort win.",
     "origin": "Old P3",
-    "target": "2026-11-06",
+    "target": "2026-11-20",
     "targetKind": "scope"
   },
   {
@@ -122,8 +122,8 @@
     "active": true,
     "notes": "Agreed with Wade in Aug 2026 catch-up. Priority immediately after site refresh ships. Target: end of 2026. Denis to implement using Capacitor — web-friendly, no prior native experience needed, compatible with existing PWA work. OneSignal Capacitor plugin available. Solves the IAB problem on iOS — strongest concrete driver.\n\nInvestigate Apple 30% tax: check whether current paid members are subject to it via in-app subscriptions, and whether web-only sign-up can route around it.",
     "origin": "Aug 2026 catch-up",
-    "target": "2026-10-30",
-    "targetKind": "scope"
+    "target": "2027-01-15",
+    "targetKind": "deliver"
   },
   {
     "id": "comments-platform",
@@ -135,7 +135,7 @@
     "active": false,
     "notes": "Discourse full app embed is already live on the EC instance. Would eliminate a separate platform dependency.",
     "origin": "New idea",
-    "target": "2026-10-30",
+    "target": "2026-11-20",
     "targetKind": "scope"
   },
   {
@@ -145,10 +145,10 @@
     "description": "Way more intuitive and accurate search results from the native search bar.",
     "impact": "med",
     "complexity": "low",
-    "status": "blocked",
+    "status": "planned",
     "notes": "Outpost integration does the hard work, we just need to style and config it.",
     "origin": "",
-    "target": "2026-10-23",
+    "target": "2026-11-24",
     "targetKind": "deliver"
   },
   {
@@ -161,7 +161,7 @@
     "active": false,
     "notes": "Extends Release 1 Racing tab. Leans on race-data-api. Paused until more fully formed.\n\nTV Guide backend is a related dependency for pre-race HTRWW data.",
     "origin": "New idea",
-    "target": "2026-11-27",
+    "target": "2026-12-04",
     "targetKind": "scope"
   },
   {
